@@ -7,7 +7,6 @@ from pathlib import Path
 from typing import Tuple, Union
 
 import numpy as np
-import xgboost as xgb
 
 from uq_mlip.data import EmbeddingData, load_embeddings
 
@@ -43,6 +42,8 @@ class UQModel:
 
     def fit(self, embeddings: EmbeddingData) -> "UQModel":
         """Fit the quantile model on per-atom embeddings and per-atom energies."""
+
+        import xgboost as xgb
 
         embeddings.validate(require_energies=True)
         matrix = xgb.QuantileDMatrix(embeddings.node_feats, embeddings.node_energies)

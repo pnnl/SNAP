@@ -13,6 +13,31 @@ MACE and UMA are supported out of the box as default model backends:
 
 ```
 pip install uq-mlip
+pip install uq-mlip[mace]  # for MACE extraction
+pip install uq-mlip[uma]   # for UMA extraction
+```
+
+For a local checkout, use `pip install -e .`, then install the backend extra
+you need. MACE and UMA currently depend on incompatible `e3nn` versions, so use
+separate environments if you need to exercise both dependency stacks.
+
+To automate backend-specific setup:
+
+```
+scripts/create_backend_env.sh mace
+scripts/create_backend_env.sh uma
+```
+
+On macOS, XGBoost may also require the OpenMP runtime:
+
+```
+brew install libomp
+```
+
+For UMA on systems where `~/.cache` is not writable:
+
+```
+export FAIRCHEM_CACHE_DIR=/path/to/writable/fairchem-cache
 ```
 
 Train a UQ model:
@@ -26,6 +51,20 @@ uq-mlip extract \
 uq-mlip train \
   --embeddings embeddings/embedding_info_validation.npz \
   --savedir uq-model/
+```
+
+Run the local hello world example to train a small UQ model, predict a synthetic
+trajectory, and generate a UQ profile visualization:
+
+```
+python examples/hello_world/train_run_visualize.py
+```
+
+To smoke-test a real backend in its own environment:
+
+```
+scripts/run_backend_hello_world.sh mace
+scripts/run_backend_hello_world.sh uma
 ```
 
 Use it in existing code with the decorator-style calculator:
@@ -58,8 +97,9 @@ Energy and force calls continue to behave like the original calculator. After a
 calculation, per-atom uncertainty is available as `atoms.arrays["uq"]`,
 `atoms.arrays["uq_lower"]`, and `atoms.arrays["uq_upper"]`.
 
-See `docs/quickstart.md` for the package-oriented workflow and how to add a new
-MLIP backend.
+See `docs/quickstart.md` for the package-oriented workflow,
+`docs/validation_plan.md` for pre-merge validation, and instructions for adding
+a new MLIP backend.
 
 ## Requirements
 

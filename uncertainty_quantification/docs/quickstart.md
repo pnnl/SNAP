@@ -6,10 +6,43 @@ and dataset you plan to use.
 
 ## Install
 
-MACE and UMA are supported out of the box as flagship backends:
+MACE and UMA are supported out of the box as default model backends. Install the
+core package first:
 
 ```bash
 pip install uq-mlip
+```
+
+Then install the backend dependency stack you plan to use:
+
+```bash
+pip install uq-mlip[mace]
+pip install uq-mlip[uma]
+```
+
+For a local checkout, use `pip install -e .` and then install the matching
+editable extra, for example `pip install -e ".[mace]"`.
+
+MACE and UMA currently depend on incompatible `e3nn` versions, so use separate
+environments if you need to run both backends.
+
+The setup scripts automate this:
+
+```bash
+scripts/create_backend_env.sh mace
+scripts/create_backend_env.sh uma
+```
+
+On macOS, install OpenMP before training the GBM model with XGBoost:
+
+```bash
+brew install libomp
+```
+
+For UMA on systems where `~/.cache` is not writable, set:
+
+```bash
+export FAIRCHEM_CACHE_DIR=/path/to/writable/fairchem-cache
 ```
 
 ## Train a UQ model
@@ -41,6 +74,28 @@ uq-mlip extract \
   --model-size uma-m-1p1 \
   --head omat
 ```
+
+## Hello world
+
+The synthetic hello world runs without downloading MACE or UMA model weights:
+
+```bash
+python examples/hello_world/train_run_visualize.py
+```
+
+It writes:
+
+- `examples/hello_world/outputs/results/UQ_synthetic_run.csv.gz`
+- `examples/hello_world/outputs/uq_profile.svg`
+
+To verify a real backend end to end, use a backend-specific environment:
+
+```bash
+scripts/run_backend_hello_world.sh mace
+scripts/run_backend_hello_world.sh uma
+```
+
+These backend workflows use the small test dataset in `examples/test_data/`.
 
 ## Use UQ in existing code
 
