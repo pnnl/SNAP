@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "uq-mlip"
+version = "0.1.0"
+description = "Per-atom uncertainty quantification for machine learning interatomic potentials."
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+  "ase",
+  "fairchem-core",
+  "mace-torch",
+  "numpy",
+  "pandas",
+  "torch",
+  "xgboost",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest",
+]
+
+[project.scripts]
+uq-mlip = "uq_mlip.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

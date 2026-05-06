@@ -2,6 +2,65 @@
 
 This repository contains code for training and evaluating the Uncertainty Quantification for Machine Learning Interatomic Potentials (MLIPs) method described in the paper "Per-atom Uncertainty Quantification for Machine Learning Interatomic Potentials (MLIPs)". The code is organized into several scripts that can be used to train the MLIP model, generate embeddings, and evaluate the model's performance.
 
+## Simple package workflow
+
+`uq-mlip` makes per-atom uncertainty quantification easy to add to MLIP
+workflows. The UQ model is specific to the MLIP and dataset, so users should
+train a UQ model on validation or representative configurations before using it
+in simulations.
+
+MACE and UMA are supported out of the box as default model backends:
+
+```
+pip install uq-mlip
+```
+
+Train a UQ model:
+
+```
+uq-mlip extract \
+  --backend mace \
+  --sample validation.xyz \
+  --savedir embeddings/
+
+uq-mlip train \
+  --embeddings embeddings/embedding_info_validation.npz \
+  --savedir uq-model/
+```
+
+Use it in existing code with the decorator-style calculator:
+
+```python
+from uq_mlip import UQCalculator
+
+atoms.calc = UQCalculator(
+    base_calculator=mace_calc,
+    uq_model="uq-model/",
+    backend="mace",
+    model="medium-0b",
+)
+```
+
+Or use the convenience helper:
+
+```python
+from uq_mlip import with_uq
+
+atoms.calc = with_uq(
+    mace_calc,
+    uq_model="uq-model/",
+    backend="mace",
+    model="medium-0b",
+)
+```
+
+Energy and force calls continue to behave like the original calculator. After a
+calculation, per-atom uncertainty is available as `atoms.arrays["uq"]`,
+`atoms.arrays["uq_lower"]`, and `atoms.arrays["uq_upper"]`.
+
+See `docs/quickstart.md` for the package-oriented workflow and how to add a new
+MLIP backend.
+
 ## Requirements
 
 The code requires Python 3.8 or higher, your MLIP package of choice (such as [MACE](https://github.com/ACEsuit/mace) or [UMA](https://huggingface.co/facebook/UMA)), and the following packages:
@@ -68,5 +127,27 @@ python run-gbm.py --embeddings 'data/embeddings/embedding_info_md_run.npz' --sav
 ```
 
 ## Citation
-If you use this code in your research, please cite the following paper:
+If you use this model or code in your research, please cite the following papers:
 
+```bibtex
+@article{Bilbrey2025,
+  author = {Bilbrey, Jenna A. and Firoz, Jesun S. and Lee, Mal-Soon and Choudhury, Sutanay},
+  title = {Uncertainty quantification for neural network potential foundation models},
+  journal = {npj Computational Materials},
+  year = {2025},
+  volume = {11},
+  number = {1},
+  pages = {109},
+  doi = {10.1038/s41524-025-01572-y},
+  url = {https://doi.org/10.1038/s41524-025-01572-y}
+}
+
+@article{Bilbrey2026,
+  author = {Bilbrey, Jenna A. and Firoz, Jesun S. and Allec, Sarah I. and Sprueill, Henry W. and von Rueden, Alexander D. and Jackson, Benjamin A. and Raugei, Simone and Lee, Mal-Soon and Choudhury, Sutanay},
+  title = {Assessing universal MLIP robustness with per-atom uncertainty for simulations of solid-liquid interfaces},
+  journal = {npj Computational Materials},
+  year = {2026},
+  doi = {10.1038/s41524-026-02051-8},
+  url = {https://doi.org/10.1038/s41524-026-02051-8}
+}
+```
