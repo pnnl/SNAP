@@ -1,8 +1,12 @@
 # Per-atom Uncertainty Quantification for Machine Learning Interatomic Potentials (MLIPs)
 
-This repository contains code for training and evaluating the Uncertainty Quantification for Machine Learning Interatomic Potentials (MLIPs) method described in the paper "Per-atom Uncertainty Quantification for Machine Learning Interatomic Potentials (MLIPs)". The code is organized into several scripts that can be used to train the MLIP model, generate embeddings, and evaluate the model's performance.
+This repository contains code for training and evaluating per-atom uncertainty
+quantification for machine learning interatomic potentials (MLIPs). The
+recommended interface is the installable `uq-mlip` package, which provides a
+unified command-line and Python API for the same extract, train, and predict
+workflow available in the standalone scripts.
 
-## Simple package workflow
+## Quick start
 
 `uq-mlip` makes per-atom uncertainty quantification easy to add to MLIP
 workflows. The UQ model is specific to the MLIP and dataset, so users should
@@ -101,19 +105,13 @@ See `docs/quickstart.md` for the package-oriented workflow,
 `docs/validation_plan.md` for pre-merge validation, and instructions for adding
 a new MLIP backend.
 
-## Requirements
+## Standalone script interface
 
-The code requires Python 3.8 or higher, your MLIP package of choice (such as [MACE](https://github.com/ACEsuit/mace) or [UMA](https://huggingface.co/facebook/UMA)), and the following packages:
-- numpy
-- pandas
-- ase
-- torch
-- xgboost
+The commands below expose the same workflow through the original script-level
+entry points. They remain useful for direct inspection, debugging, and
+reproducing the paper-era workflow.
 
-
-## Usage
-
-### Extract per-atom embeddings and energies using a trained MLIP
+### Extract embeddings and per-atom energies
 
 To train the GBM model, we first need to extract per-atom embeddings and per-atom energies from a trained MLIP. The following commands provide methods to extract this information for MACE and UMA. If using a finetuned checkpoint, the `--checkpoint` flag can be used to specify the path to the checkpoint file. The sample should be in a format readable by ASE and contain configurations *from the validation set* used to train or finetune the MLIP.
 
