@@ -64,11 +64,25 @@ trajectory, and generate a UQ profile visualization:
 python examples/hello_world/train_run_visualize.py
 ```
 
+To make a tiny complete-frame fixture from a large XYZ/extXYZ trajectory:
+
+```
+python scripts/slice_xyz.py /path/to/large.xyz examples/test_data/my_slice.xyz --frames 8
+```
+
 To smoke-test a real backend in its own environment:
 
 ```
-scripts/run_backend_hello_world.sh mace
-scripts/run_backend_hello_world.sh uma
+scripts/run_hello_world.sh mace
+scripts/run_hello_world.sh uma
+```
+
+You can pass custom train/run slices to the backend smoke test without copying a
+large trajectory into the repository:
+
+```
+scripts/run_hello_world.sh mace .venv-mace outputs/mace-small \
+  examples/test_data/aimd_pbe_train.xyz examples/test_data/aimd_pbe_run.xyz
 ```
 
 Use it in existing code with the decorator-style calculator:
@@ -101,9 +115,14 @@ Energy and force calls continue to behave like the original calculator. After a
 calculation, per-atom uncertainty is available as `atoms.arrays["uq"]`,
 `atoms.arrays["uq_lower"]`, and `atoms.arrays["uq_upper"]`.
 
-See `docs/quickstart.md` for the package-oriented workflow,
-`docs/validation_plan.md` for pre-merge validation, and instructions for adding
-a new MLIP backend.
+To verify a local checkout:
+
+```
+pip install -e ".[dev]"
+python -m pytest
+uq-mlip --help
+python examples/hello_world/train_run_visualize.py
+```
 
 ## Standalone script interface
 

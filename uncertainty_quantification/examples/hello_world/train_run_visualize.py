@@ -2,7 +2,7 @@
 
 This example avoids MACE/UMA downloads so every developer can verify the core
 UQ workflow quickly. Backend-specific extraction smoke tests are handled by
-scripts/run_backend_hello_world.sh.
+scripts/run_hello_world.sh.
 """
 
 from __future__ import annotations

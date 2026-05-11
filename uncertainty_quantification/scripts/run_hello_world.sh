@@ -4,8 +4,8 @@ set -euo pipefail
 usage() {
   cat <<'USAGE'
 Usage:
-  scripts/run_backend_hello_world.sh mace [venv_path] [outdir]
-  scripts/run_backend_hello_world.sh uma [venv_path] [outdir]
+  scripts/run_hello_world.sh mace [venv_path] [outdir] [train_sample] [run_sample]
+  scripts/run_hello_world.sh uma [venv_path] [outdir] [train_sample] [run_sample]
 
 This runs extract -> train -> predict -> plot on a tiny XYZ file using the
 selected backend. It may download model weights the first time the backend is
@@ -13,7 +13,7 @@ used.
 USAGE
 }
 
-if [[ $# -lt 1 || $# -gt 3 ]]; then
+if [[ $# -lt 1 || $# -gt 5 ]]; then
   usage
   exit 2
 fi
@@ -21,8 +21,12 @@ fi
 backend="$1"
 venv_path="${2:-.venv-${backend}}"
 outdir="${3:-examples/hello_world/outputs-${backend}}"
-train_sample="examples/test_data/water_train.xyz"
-run_sample="examples/test_data/water_run.xyz"
+train_sample="${4:-examples/test_data/water_train.xyz}"
+run_sample="${5:-examples/test_data/water_run.xyz}"
+train_stem="$(basename "$train_sample")"
+train_stem="${train_stem%.*}"
+run_stem="$(basename "$run_sample")"
+run_stem="${run_stem%.*}"
 
 case "$backend" in
   mace|uma) ;;
@@ -79,8 +83,8 @@ else
     --index ":"
 fi
 
-train_embedding_file="$outdir/embeddings/embedding_info_water_train.npz"
-run_embedding_file="$outdir/embeddings/embedding_info_water_run.npz"
+train_embedding_file="$outdir/embeddings/embedding_info_${train_stem}.npz"
+run_embedding_file="$outdir/embeddings/embedding_info_${run_stem}.npz"
 
 uq-mlip train \
   --embeddings "$train_embedding_file" \
@@ -93,7 +97,7 @@ uq-mlip predict \
   --savedir "$outdir/results"
 
 python examples/hello_world/plot_uq_profile.py \
-  --csv "$outdir/results/UQ_embedding_info_water_run.csv.gz" \
+  --csv "$outdir/results/UQ_embedding_info_${run_stem}.csv.gz" \
   --output "$outdir/uq_profile.svg" \
   --title "uq-mlip $backend hello world"
 
