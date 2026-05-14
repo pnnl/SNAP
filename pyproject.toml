@@ -50,10 +50,10 @@ dev = [
 uq-mlip = "uq_mlip.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/pnnl/SNAP"
-Repository = "https://github.com/pnnl/SNAP"
-Issues = "https://github.com/pnnl/SNAP/issues"
-Primer = "https://github.com/pnnl/SNAP/blob/master/docs/UQ_for_NNPs_Primer.pdf"
+Homepage = "https://github.com/pnnl/UQ-MLIP"
+Repository = "https://github.com/pnnl/UQ-MLIP"
+Issues = "https://github.com/pnnl/UQ-MLIP/issues"
+Primer = "https://github.com/pnnl/UQ-MLIP/blob/master/docs/UQ_for_NNPs_Primer.pdf"
 
 [tool.setuptools.packages.find]
 where = ["src"]

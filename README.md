@@ -1,10 +1,10 @@
 # uq-mlip: Per-atom Uncertainty Quantification for MLIPs
 
-[![Python](https://img.shields.io/badge/python-3.11%2B-blue)](https://github.com/pnnl/SNAP/blob/master/pyproject.toml)
+[![Python](https://img.shields.io/badge/python-3.11%2B-blue)](https://github.com/pnnl/UQ-MLIP/blob/master/pyproject.toml)
 [![Research](https://img.shields.io/badge/papers-npj%20Computational%20Materials-4b32c3)](#research-background)
-[![License](https://img.shields.io/badge/license-BSD--2--Clause-blue)](https://github.com/pnnl/SNAP/blob/master/LICENSE)
+[![License](https://img.shields.io/badge/license-BSD--2--Clause-blue)](https://github.com/pnnl/UQ-MLIP/blob/master/LICENSE)
 
-![uq-mlip banner: uncertainty quantification for neural network potentials in chemistry](https://raw.githubusercontent.com/pnnl/SNAP/master/docs/assets/banner-uq-mlip.png)
+![uq-mlip banner: uncertainty quantification for neural network potentials in chemistry](https://raw.githubusercontent.com/pnnl/UQ-MLIP/master/docs/assets/banner-uq-mlip.png)
 
 This repository contains code for training and evaluating per-atom uncertainty
 quantification for machine learning interatomic potentials (MLIPs). The
@@ -15,7 +15,7 @@ workflow available in the standalone scripts.
 ## New to UQ for NNPs?
 
 > New to uncertainty quantification for neural network potentials? Start with
-> the [UQ for NNPs primer](https://github.com/pnnl/SNAP/blob/master/docs/UQ_for_NNPs_Primer.pdf).
+> the [UQ for NNPs primer](https://github.com/pnnl/UQ-MLIP/blob/master/docs/UQ_for_NNPs_Primer.pdf).
 
 The primer gives a beginner-friendly overview of what uncertainty
 quantification means for neural network potentials, why per-atom uncertainty is
@@ -50,8 +50,8 @@ in simulations.
 MACE and UMA are supported out of the box as default model backends:
 
 ```
-git clone https://github.com/pnnl/SNAP.git
-cd SNAP
+git clone https://github.com/pnnl/UQ-MLIP.git
+cd UQ-MLIP
 git checkout master
 pip install -e .
 ```
