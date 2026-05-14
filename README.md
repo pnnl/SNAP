@@ -24,7 +24,8 @@ useful, and how the workflow in this repository fits into simulation practice.
 ## Research background
 
 `uq-mlip` implements uncertainty quantification workflows developed through two
-peer-reviewed studies in *npj Computational Materials*:
+peer-reviewed studies in
+![npj Computational Materials](https://img.shields.io/badge/npj%20Computational%20Materials-peer--reviewed-4b32c3):
 
 - [Uncertainty quantification for neural network potential foundation models](https://doi.org/10.1038/s41524-025-01572-y)
   introduces the UQ approach for neural network potential foundation models.
