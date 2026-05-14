@@ -173,7 +173,12 @@ reproducing the paper-era workflow.
 
 ### Extract embeddings and per-atom energies
 
-To train the GBM model, we first need to extract per-atom embeddings and per-atom energies from a trained MLIP. The following commands provide methods to extract this information for MACE and UMA. If using a finetuned checkpoint, the `--checkpoint` flag can be used to specify the path to the checkpoint file. The sample should be in a format readable by ASE and contain configurations *from the validation set* used to train or finetune the MLIP.
+To train the GBM model, first extract per-atom embeddings and per-atom energies
+from a trained MLIP. The following commands provide methods to extract this
+information for MACE and UMA. If using a finetuned checkpoint, the
+`--checkpoint` flag can be used to specify the path to the checkpoint file. The
+sample should be in a format readable by ASE and contain configurations *from
+the validation set* used to train or finetune the MLIP.
 
 ```
 python run_embeddings_mace.py \
@@ -195,20 +200,22 @@ python run_embeddings_uma.py \
 
 ### Train GBM on per-atom embeddings and energies
 
-Once the embeddings and energies have been extracted,the GBM model can be trained using the following command. 
+Once the embeddings and energies have been extracted, the GBM model can be
+trained using the following command.
 
 ```
 python train-gbm.py --embeddings data/embeddings_mace/embedding_info_example.npz \
-	--savedir data/gbm_mace \
+  --savedir data/gbm_mace \
   --upper-alpha 0.95 \
   --lower-alpha 0.05 \
-  --estimators 1000 
-  ```
+  --estimators 1000
+```
 
 
 ### Compute per-atom uncertainties using the trained GBM model
 
-To compute per-atom uncertainties for a trajectory produced using the MLIP, the per-atom embeddings must be extracted in the same was as described above. 
+To compute per-atom uncertainties for a trajectory produced using the MLIP, the
+per-atom embeddings must be extracted in the same way as described above.
 
 ```
 python run_embeddings_mace.py \
@@ -218,7 +225,8 @@ python run_embeddings_mace.py \
   --index ":"
 ```
 
-Then, the following command can be used to compute per-atom uncertainties using the trained GBM model.
+Then, the following command can be used to compute per-atom uncertainties using
+the trained GBM model.
 
 ```
 python run-gbm.py --embeddings 'data/embeddings/embedding_info_md_run.npz' --savedir 'results/gbm_mace'
