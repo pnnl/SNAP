@@ -1,129 +1,210 @@
-# It's A SNAP!
-## Scalable Neural network Atomic Potentials (SNAP) 
-A PyTorch Lightning-based neural network potential (NNP) training wrapper.
+# Per-atom Uncertainty Quantification for Machine Learning Interatomic Potentials (MLIPs)
 
-### Environment
-Create a new conda environment as follows:
+This repository contains code for training and evaluating per-atom uncertainty
+quantification for machine learning interatomic potentials (MLIPs). The
+recommended interface is the installable `uq-mlip` package, which provides a
+unified command-line and Python API for the same extract, train, and predict
+workflow available in the standalone scripts.
 
-```
-conda create --name wrap python=3.11
-conda activate wrap 
-export PYTHONUSERBASE=$CONDA_PREFIX
-python -m pip install --user torch torchvision --index-url https://download.pytorch.org/whl/cu124
-python -m pip install --user torch_scatter -f https://data.pyg.org/whl/torch-2.4.0+cu124.html
-python -m pip install --user lightning
-python -m pip install --user torch_geometric
-python -m pip install --user torch_ema
-python -m pip install --user e3nn 
-python -m pip install --user ase pandas h5py prettytable
-python -m pip install --user matscipy 
-```
+## Quick start
 
-Load environment with `conda activate wrap`
+`uq-mlip` makes per-atom uncertainty quantification easy to add to MLIP
+workflows. The UQ model is specific to the MLIP and dataset, so users should
+train a UQ model on validation or representative configurations before using it
+in simulations.
 
-Install this repo as follows:
+MACE and UMA are supported out of the box as default model backends:
 
 ```
-python -m pip install git+https://github.com/pnnl/SNAP.git
+pip install uq-mlip
+pip install uq-mlip[mace]  # for MACE extraction
+pip install uq-mlip[uma]   # for UMA extraction
 ```
 
-#### Tested Package Versions
-* python 3.11
-* pytorch 2.5  (cu12-12.4.127)
-* torch_scatter 2.1.2
-* lightning 2.4.0
-* torch_gemetric 2.6.1
-* e3nn 0.5.1
-* torch-ema 0.3
-* numpy 1.25.2
+For a local checkout, use `pip install -e .`, then install the backend extra
+you need. MACE and UMA currently depend on incompatible `e3nn` versions, so use
+separate environments if you need to exercise both dependency stacks.
 
-### Data Preprocessing
-Structures should be saved in .extxyz format, *including atomic forces*, and placed in the following file structure where `DATADIR` is the top-level directory.
+To automate backend-specific setup:
 
 ```
-$DATADIR 
-       |_raw
-          |_$SAMPLE
-                   |_files.extxyz (or files.xyz)
-                   |_statistics.json
+scripts/create_backend_env.sh mace
+scripts/create_backend_env.sh uma
 ```
 
-It is recommended that per-atom E0 values computed at the same level of theory as your data are used to normalize the total energy. These values for all atoms should be saved in the statistics.json file in dictionary format as follows: `{'atomic_energies': {Z_i: E0_i, ...}, 'atomic_numbers': [Z_i, ...]}`. If statistics.json is not present during the preprocessing step, one will be computed for each $SAMPLE folder using the fitting algorithm used in MACE.
-
-See [ASE io](https://wiki.fysik.dtu.dk/ase/ase/io/io.html) for converting simulation output files to .extxyz. Note that MACE-MP-0 expects energies to be in eV and forces to be in eV/Å.
-
-### Model Training
-See train-mace-mp-0.py for example training script to finetune MACE-MP-0.
-
-The below example shows how to finetune the 'small' MACE-MP-0 model.
-```
-srun python train-mace-mp-0.py --savedir {SAVEDIR} --model 'small' \
-    --datadir ${DATADIR} --split-file ${DATADIR}/processed/split.npz \
-    --batch-size 16 --max-epochs 500 --min-epochs 25 \
-    --train-forces
-```
-
-#### Training Flags
- | 	Flag	 | 	Description	 | 	Default	 | 	NB	 | 
- | 	:--------	 | 	:--------	 | 	:--------:	 | 	:--------	 | 
- | 	--datadir	 | 	Top-level directory to containing the training set.	 | 		 | 	The format of the data directory must be as follows datadir/raw/$SAMPLE. Training will run over all $SAMPLE directories in raw. Files in $SAMPLE should be in .xyz or .extxyz format. A new directory called datadir/processed will be created to store the processed data in .pt format.	 | 
- | 	--savedir	 | 	Top-level directory to save training results.	 | 		 | 	The directory can but does not have to exist. A subdirectory will be created with the date and time to distinguish training runs with same savedir.	 | 
- | 	--split-file	 | 	Path to file containing train-val-test split in .npz format.	 | 	None	 | 	If no split-file is provided a randomized 80-10-10 split will be used, and the resulting split will be saved in savedir/processed.	 | 
- |  --quantile  |  Train a quantile model. | False | Currently only implemented for optimization of energy quantiles. |
- | 	--total-energy	 | 	Train on total energy instead of normalized energy.	 | 	False	 | 	Normally energy is normalized by subtracting single atom values during preprocessing. This flag will skip that step and train on total energies instead.	 | 
- | 	--train-fraction	 | 	Fraction of the training set to use each epoch.	 | 	1.0	 | 	Each training batch will be a randomized subset of the full training data. A new randomized subset will be used each epoch.	 | 
- | 	--train-forces	 | 	Include forces in the loss functions	 | 	False	 | 		 | 
- | 	--batch-size	 | 	Number of samples per training batch.	 | 	32	 | 		 | 
- | 	--dynamic-batch	 | 	Use dynamic batching based on the number of nodes per sample.	 | 	False	 | 	If applied, progress bar will be disabled. Currently only available for single GPU training.	 | 
- | 	--max-epochs	 | 	Maximum number of training epochs.	 | 	500	 | 		 | 
- | 	--min-epochs	 | 	Minimum number of training epochs.	 | 	1	 | 		 | 
- | 	--max-time	 | 	Maximum amount of time for training.	 | 	None	 | 	Formatted as a string, for example, 00:12:00:00.	 | 
- | 	--lr	 | 	Initial learning rate.	 | 	0.001	 | 		 | 
- | 	--lr-patience	 | 	Number of epochs before decreasing learning rate.	 | 	10	 | 		 | 
- | 	--es-patience	 | 	Number of epochs without improvement in validation set loss before stopping.	 | 	25	 | 		 | 
- | 	--swa	 | 	Apply Stochastic Weight Averaging.	 | 	False	 | 		 | 
- | 	--clip	 | 	Gradient clipping value.	 | 	200	 | 		 | 
- | 	--progress-bar	 | 	Display progress bar during training.	 | 	False	 | 	Not applied if dynamic-batch is called.	 | 
- | 	--seed	 | 	Seed for torch, cuda, numpy.	 | 	42	 | 		 | 
- | 	--full-reproducibility	 | 	Use all deterministic algorithms.	 | 	False	 | 	Will make training on GPUs slightly slower.	 | 
- | 	--amp	 | 	Use Automatic Mixed Precision.	 | 	False	 | 	If train-forces is called, forces will be scaled in the loss.	 | 
-
-#### Additional MACE-MP-0 Flags
- | 	Flag	 | 	Description	 | 	Default	 | 	NB	 | 
- | 	:--------	 | 	:--------	 | 	:--------:	 | 	:--------	 | 
- | 	--model	 | 	Size of the MACE-MP-0 foundation model to use.	 | 	medium	 | 	Choices: small, medium, large. Pretrained model weights will be loaded.	 | 
- | 	--checkpoint	 | 	Path to checkpoint to resume training.	 | 	None	 | 		 | 
- | 	--freeze-head	 | 	Freeze interaction head during training.	 | 	False	 | 	If applied, only weights from the readout layer will be updated during training.	 | 
- | 	--fresh-start	 | 	Re-initialize model weights before training.	 | 	False	 | 	Pretrained weights will be removed and training will begin from scratch.	 | 
- | 	--default-dtype	 | 	Default dtype for model weights.	 | 	float32	 | 		 | 
-
-
-#### Multi-GPU
-There are two parameters in the SLURM submission script that determine how many processes will run your training, the `#SBATCH --nodes=X` setting and `#SBATCH --ntasks-per-node=Y` settings. The numbers there need to match what is configured in your Trainer in the code: `Trainer(num_nodes=X, devices=Y)`. If you change the numbers, update them in BOTH places. 
-
-The example script sets both `num_nodes` and `devices` to be automatically be detected by the Trainer. If using the example script, training over 2 gpus (nproc_per_node) on 1 node (nnodes) can be performed as follows:
-```
-srun python -m torch.distributed.run --nnodes=1 --nproc_per_node=2 train-mace-mp-0.py \
-    --datadir ${DATADIR} --split-file ${DATADIR}/processed/split.npz \
-    --batch-size 16 --max-epochs 500 --min-epochs 25 \
-    --train-forces
-```
-
-### References
-If you use this code, please cite our associated publication:
+On macOS, XGBoost may also require the OpenMP runtime:
 
 ```
-@article{bilbrey2025uncertainty,
-  title={Uncertainty Quantification for Neural Network Potential Foundation Models},
-  author={Bilbrey, Jenna A and Firoz, Jesun S and Lee, Mal-Soon and Choudhury, Sutanay},
-  journal={npj Computational Materials},
-  volume={11},
-  number={109},
-  year={2025},
-  doi={10.1038/s41524-025-01572-y},
-  url={https://www.nature.com/articles/s41524-025-01572-y},
+brew install libomp
+```
+
+For UMA on systems where `~/.cache` is not writable:
+
+```
+export FAIRCHEM_CACHE_DIR=/path/to/writable/fairchem-cache
+```
+
+Train a UQ model:
+
+```
+uq-mlip extract \
+  --backend mace \
+  --sample validation.xyz \
+  --savedir embeddings/
+
+uq-mlip train \
+  --embeddings embeddings/embedding_info_validation.npz \
+  --savedir uq-model/
+```
+
+Run the local hello world example to train a small UQ model, predict a synthetic
+trajectory, and generate a UQ profile visualization:
+
+```
+python examples/hello_world/train_run_visualize.py
+```
+
+To make a tiny complete-frame fixture from a large XYZ/extXYZ trajectory:
+
+```
+python scripts/slice_xyz.py /path/to/large.xyz examples/test_data/my_slice.xyz --frames 8
+```
+
+To smoke-test a real backend in its own environment:
+
+```
+scripts/run_hello_world.sh mace
+scripts/run_hello_world.sh uma
+```
+
+You can pass custom train/run slices to the backend smoke test without copying a
+large trajectory into the repository:
+
+```
+scripts/run_hello_world.sh mace .venv-mace outputs/mace-small \
+  examples/test_data/aimd_pbe_train.xyz examples/test_data/aimd_pbe_run.xyz
+```
+
+Use it in existing code with the decorator-style calculator:
+
+```python
+from uq_mlip import UQCalculator
+
+atoms.calc = UQCalculator(
+    base_calculator=mace_calc,
+    uq_model="uq-model/",
+    backend="mace",
+    model="medium-0b",
+)
+```
+
+Or use the convenience helper:
+
+```python
+from uq_mlip import with_uq
+
+atoms.calc = with_uq(
+    mace_calc,
+    uq_model="uq-model/",
+    backend="mace",
+    model="medium-0b",
+)
+```
+
+Energy and force calls continue to behave like the original calculator. After a
+calculation, per-atom uncertainty is available as `atoms.arrays["uq"]`,
+`atoms.arrays["uq_lower"]`, and `atoms.arrays["uq_upper"]`.
+
+To verify a local checkout:
+
+```
+pip install -e ".[dev]"
+python -m pytest
+uq-mlip --help
+python examples/hello_world/train_run_visualize.py
+```
+
+## Standalone script interface
+
+The commands below expose the same workflow through the original script-level
+entry points. They remain useful for direct inspection, debugging, and
+reproducing the paper-era workflow.
+
+### Extract embeddings and per-atom energies
+
+To train the GBM model, we first need to extract per-atom embeddings and per-atom energies from a trained MLIP. The following commands provide methods to extract this information for MACE and UMA. If using a finetuned checkpoint, the `--checkpoint` flag can be used to specify the path to the checkpoint file. The sample should be in a format readable by ASE and contain configurations *from the validation set* used to train or finetune the MLIP.
+
+```
+python run_embeddings_mace.py \
+  --sample data/example.xyz \
+  --savedir data/embeddings_mace \
+  --model-size medium-0b \
+  --index ":"
+```
+
+```
+python run_embeddings_uma.py \
+  --sample data/example.xyz \
+  --savedir data/embeddings_uma \
+  --model-size uma-s-1p1 \
+  --head 'omat' \
+  --index ":"
+```
+
+
+### Train GBM on per-atom embeddings and energies
+
+Once the embeddings and energies have been extracted,the GBM model can be trained using the following command. 
+
+```
+python train-gbm.py --embeddings data/embeddings_mace/embedding_info_example.npz \
+	--savedir data/gbm_mace \
+  --upper-alpha 0.95 \
+  --lower-alpha 0.05 \
+  --estimators 1000 
+  ```
+
+
+### Compute per-atom uncertainties using the trained GBM model
+
+To compute per-atom uncertainties for a trajectory produced using the MLIP, the per-atom embeddings must be extracted in the same was as described above. 
+
+```
+python run_embeddings_mace.py \
+  --sample data/md_run.xyz \
+  --savedir data/embeddings_mace \
+  --model-size medium-0b \
+  --index ":"
+```
+
+Then, the following command can be used to compute per-atom uncertainties using the trained GBM model.
+
+```
+python run-gbm.py --embeddings 'data/embeddings/embedding_info_md_run.npz' --savedir 'results/gbm_mace'
+```
+
+## Citation
+If you use this model or code in your research, please cite the following papers:
+
+```bibtex
+@article{Bilbrey2025,
+  author = {Bilbrey, Jenna A. and Firoz, Jesun S. and Lee, Mal-Soon and Choudhury, Sutanay},
+  title = {Uncertainty quantification for neural network potential foundation models},
+  journal = {npj Computational Materials},
+  year = {2025},
+  volume = {11},
+  number = {1},
+  pages = {109},
+  doi = {10.1038/s41524-025-01572-y},
+  url = {https://doi.org/10.1038/s41524-025-01572-y}
+}
+
+@article{Bilbrey2026,
+  author = {Bilbrey, Jenna A. and Firoz, Jesun S. and Allec, Sarah I. and Sprueill, Henry W. and von Rueden, Alexander D. and Jackson, Benjamin A. and Raugei, Simone and Lee, Mal-Soon and Choudhury, Sutanay},
+  title = {Assessing universal MLIP robustness with per-atom uncertainty for simulations of solid-liquid interfaces},
+  journal = {npj Computational Materials},
+  year = {2026},
+  doi = {10.1038/s41524-026-02051-8},
+  url = {https://doi.org/10.1038/s41524-026-02051-8}
 }
 ```
-
-### Acknowledgements
-Initial development of this codebase was supported by the "Transferring exascale computational chemistry to cloud computing environment and emerging hardware technologies (TEC4)"  project, which is funded by the U.S. Department of Energy, Office of Science, Office of Basic Energy Sciences, the Division of Chemical Sciences, Geosciences, and Biosciences (under FWP 82037).
