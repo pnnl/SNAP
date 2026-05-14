@@ -6,6 +6,13 @@ recommended interface is the installable `uq-mlip` package, which provides a
 unified command-line and Python API for the same extract, train, and predict
 workflow available in the standalone scripts.
 
+## New to UQ for NNPs?
+
+Start with the [UQ for NNPs primer](docs/UQ_for_NNPs_Primer.pdf). It gives a
+beginner-friendly overview of what uncertainty quantification means for neural
+network potentials, why per-atom uncertainty is useful, and how the workflow in
+this repository fits into simulation practice.
+
 ## Quick start
 
 `uq-mlip` makes per-atom uncertainty quantification easy to add to MLIP
