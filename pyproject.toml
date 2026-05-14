@@ -8,6 +8,26 @@ version = "0.1.0"
 description = "Per-atom uncertainty quantification for machine learning interatomic potentials."
 readme = "README.md"
 requires-python = ">=3.11,<3.14"
+license = "BSD-2-Clause"
+keywords = [
+  "atomistic simulation",
+  "computational chemistry",
+  "machine learning interatomic potentials",
+  "materials science",
+  "mlip",
+  "neural network potentials",
+  "uncertainty quantification",
+]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Science/Research",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Scientific/Engineering :: Chemistry",
+  "Topic :: Scientific/Engineering :: Physics",
+]
 dependencies = [
   "ase",
   "numpy",
@@ -28,6 +48,12 @@ dev = [
 
 [project.scripts]
 uq-mlip = "uq_mlip.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/pnnl/SNAP"
+Repository = "https://github.com/pnnl/SNAP"
+Issues = "https://github.com/pnnl/SNAP/issues"
+Primer = "https://github.com/pnnl/SNAP/blob/master/docs/UQ_for_NNPs_Primer.pdf"
 
 [tool.setuptools.packages.find]
 where = ["src"]

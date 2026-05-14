@@ -1,4 +1,8 @@
-# Per-atom Uncertainty Quantification for Machine Learning Interatomic Potentials (MLIPs)
+# uq-mlip: Per-atom Uncertainty Quantification for MLIPs
+
+[![Python](https://img.shields.io/badge/python-3.11%2B-blue)](pyproject.toml)
+[![Research](https://img.shields.io/badge/papers-npj%20Computational%20Materials-4b32c3)](#research-background)
+[![License](https://img.shields.io/badge/license-BSD--2--Clause-blue)](LICENSE)
 
 ![uq-mlip banner: uncertainty quantification for neural network potentials in chemistry](docs/assets/banner-uq-mlip.png)
 
@@ -10,10 +14,30 @@ workflow available in the standalone scripts.
 
 ## New to UQ for NNPs?
 
-Start with the [UQ for NNPs primer](docs/UQ_for_NNPs_Primer.pdf). It gives a
-beginner-friendly overview of what uncertainty quantification means for neural
-network potentials, why per-atom uncertainty is useful, and how the workflow in
-this repository fits into simulation practice.
+> New to uncertainty quantification for neural network potentials? Start with
+> the [UQ for NNPs primer](docs/UQ_for_NNPs_Primer.pdf).
+
+The primer gives a beginner-friendly overview of what uncertainty
+quantification means for neural network potentials, why per-atom uncertainty is
+useful, and how the workflow in this repository fits into simulation practice.
+
+## Research background
+
+`uq-mlip` implements uncertainty quantification workflows developed through two
+peer-reviewed studies in *npj Computational Materials*:
+
+- [Uncertainty quantification for neural network potential foundation models](https://doi.org/10.1038/s41524-025-01572-y)
+  introduces the UQ approach for neural network potential foundation models.
+- [Assessing universal MLIP robustness with per-atom uncertainty for simulations of solid-liquid interfaces](https://doi.org/10.1038/s41524-026-02051-8)
+  demonstrates per-atom uncertainty as a practical diagnostic for MLIP
+  robustness in challenging interfacial simulations.
+
+## Why per-atom UQ?
+
+MLIP predictions can look stable even when local atomic environments are
+outside the model's reliable domain. `uq-mlip` adds per-atom uncertainty
+estimates so simulations can be inspected, filtered, or monitored at the level
+where failures often begin.
 
 ## Quick start
 
