@@ -1,5 +1,7 @@
 # Per-atom Uncertainty Quantification for Machine Learning Interatomic Potentials (MLIPs)
 
+![uq-mlip banner: uncertainty quantification for neural network potentials in chemistry](docs/assets/banner-uq-mlip.png)
+
 This repository contains code for training and evaluating per-atom uncertainty
 quantification for machine learning interatomic potentials (MLIPs). The
 recommended interface is the installable `uq-mlip` package, which provides a
