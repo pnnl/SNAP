@@ -257,3 +257,7 @@ If you use this model or code in your research, please cite the following papers
   url = {https://doi.org/10.1038/s41524-026-02051-8}
 }
 ```
+
+## Visual assets
+
+The README banner image was generated with ChatGPT.
