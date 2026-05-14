@@ -49,14 +49,22 @@ in simulations.
 MACE and UMA are supported out of the box as default model backends:
 
 ```
-pip install uq-mlip
-pip install uq-mlip[mace]  # for MACE extraction
-pip install uq-mlip[uma]   # for UMA extraction
+git clone https://github.com/pnnl/SNAP.git
+cd SNAP
+git checkout master
+pip install -e .
 ```
 
-For a local checkout, use `pip install -e .`, then install the backend extra
-you need. MACE and UMA currently depend on incompatible `e3nn` versions, so use
-separate environments if you need to exercise both dependency stacks.
+To include a backend in the same environment:
+
+```
+pip install -e ".[mace]"  # for MACE extraction
+pip install -e ".[uma]"   # for UMA extraction
+```
+
+MACE and UMA currently depend on incompatible `e3nn` versions, so use separate
+environments if you need to exercise both dependency stacks. After the first
+PyPI release, this section will be updated to use `pip install uq-mlip`.
 
 To automate backend-specific setup:
 
