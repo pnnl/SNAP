@@ -6,7 +6,7 @@ argument-hint: "<backend: mace|uma> <validation.xyz> <md_input.xyz>"
 
 # UQ-MLIP MD Workflow
 
-Train a per-atom uncertainty quantification (UQ) model on a pretrained MLIP validation set, run an MD simulation using that MLIP, and output predicted quantiles for every frame.
+Train a per-atom **aleatoric (prediction interval) uncertainty quantification** model on a pretrained MLIP validation set, run an MD simulation using that MLIP, and output predicted quantiles for every frame.
 
 ## When to Use
 
@@ -263,6 +263,17 @@ predictions = model.predict_embeddings(embeddings)
 
 ---
 
+## What This Measures
+
+This method quantifies **aleatoric (prediction interval) uncertainty**: the variance in per-atom energy predictions, estimated from residuals in the validation set. It captures how much energy scatter the MLIP exhibits locally.
+
+**It does NOT measure:**
+- Out-of-distribution detection (epistemic uncertainty)
+- Whether an atom is truly outside the training domain
+- Ensemble disagreement
+
+However, high aleatoric uncertainty often co-occurs with OOD regions, since unusual chemistries tend to have larger residuals.
+
 ## Decision Checklist
 
 - [ ] Validation XYZ contains configurations **from the MLIP's actual validation split**, not the training set
@@ -273,9 +284,9 @@ predictions = model.predict_embeddings(embeddings)
 
 ## Interpreting Results
 
-- **High `uq`** (large interval) at a frame → the MLIP is operating outside its reliable domain; consider flagging or re-running with DFT
-- **Sudden spike** in `max_uq` → a local atomic environment became unusual; check for structural artifacts
-- **All `uq` near zero** → the trajectory stays well within the training distribution
+- **High `uq`** (large interval) at a frame → the MLIP exhibits large residual variance for these atoms; predictions should be treated conservatively
+- **Sudden spike** in `max_uq` → the atoms entered a high-variance region of the MLIP's function (unusual local environment); inspect for chemical changes or rare configurations
+- **All `uq` near zero** → the trajectory stays in well-constrained regions where the MLIP has learned precise, low-scatter predictions
 
 ## References
 
