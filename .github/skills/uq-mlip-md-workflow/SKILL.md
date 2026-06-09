@@ -288,7 +288,31 @@ However, high aleatoric uncertainty often co-occurs with OOD regions, since unus
 - **Sudden spike** in `max_uq` → the atoms entered a high-variance region of the MLIP's function (unusual local environment); inspect for chemical changes or rare configurations
 - **All `uq` near zero** → the trajectory stays in well-constrained regions where the MLIP has learned precise, low-scatter predictions
 
+## Caveats and Limitations
+
+### Quantile Miscalibration Under Shift
+The nominal coverage of the quantiles (e.g., 90% for 5th–95th) assumes the test data has similar residual distributions to the validation set. If the MD trajectory is chemically very different, actual coverage will deviate.
+
+Aleatoric UQ is **conditional on the embedding**. If the embedding distribution shifts, the residual distribution you learned no longer applies. The GBM doesn't know it's extrapolating; it just makes a prediction for an embedding far from any training example. Report the coverage (or lack thereof) with your results if you suspect distribution shift
+
+### Temporal Correlation
+In MD, consecutive frames are highly correlated: atoms move only a small distance per timestep, so embeddings stay similar. This means:
+- If frame *t* has high UQ, frame *t+1* will **almost certainly also have high UQ** (not independent evidence of a problem)
+- UQ profiles will show **strong autocorrelation**, not sudden jumps
+- Once the trajectory enters a high-variance region of the MLIP's function (e.g., breaking/forming bonds), it may stay there for many frames before escaping
+- You cannot treat a UQ drop at frame *t+1* as strong statistical evidence that the trajectory "recovered" from a high-UQ frame
+
+**This is not a failure of the method**, but rather an expected property of any instantaneous frame-by-frame analysis on a slow-moving trajectory. Interpret UQ profiles as showing **persistent regions** of high/low variance, not frame-to-frame independence.
+
 ## References
+
+- [UQCalculator / with_uq API](../../../src/uq_mlip/api.py)
+- [UQModel training and prediction](../../../src/uq_mlip/model.py)
+- [Embedding data schema](../../../src/uq_mlip/data.py)
+- [MACE backend extractor](../../../src/uq_mlip/backends/mace.py)
+- [UMA backend extractor](../../../src/uq_mlip/backends/uma.py)
+- [Hello world example](../../../examples/hello_world/train_run_visualize.py)
+- [CLI reference](../../../src/uq_mlip/cli.py)
 
 - [UQCalculator / with_uq API](../../../src/uq_mlip/api.py)
 - [UQModel training and prediction](../../../src/uq_mlip/model.py)
