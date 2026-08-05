@@ -47,7 +47,7 @@ workflows. The UQ model is specific to the MLIP and dataset, so users should
 train a UQ model on validation or representative configurations before using it
 in simulations.
 
-MACE and UMA are supported out of the box as default model backends:
+MACE, UMA, and CHGNet are supported out of the box as default model backends:
 
 ```
 git clone https://github.com/pnnl/UQ-MLIP.git
@@ -59,12 +59,14 @@ pip install -e .
 To include a backend in the same environment:
 
 ```
-pip install -e ".[mace]"  # for MACE extraction
-pip install -e ".[uma]"   # for UMA extraction
+pip install -e ".[mace]"    # for MACE extraction
+pip install -e ".[uma]"     # for UMA extraction
+pip install -e ".[chgnet]"  # for CHGNet extraction
 ```
 
 MACE and UMA currently depend on incompatible `e3nn` versions, so use separate
-environments if you need to exercise both dependency stacks. After the first
+environments if you need to exercise both dependency stacks. CHGNet does not
+depend on `e3nn` and can share an environment with either. After the first
 PyPI release, this section will be updated to use `pip install uq-mlip`.
 
 To automate backend-specific setup:
@@ -72,6 +74,7 @@ To automate backend-specific setup:
 ```
 scripts/create_backend_env.sh mace
 scripts/create_backend_env.sh uma
+scripts/create_backend_env.sh chgnet
 ```
 
 On macOS, XGBoost may also require the OpenMP runtime:
@@ -117,6 +120,7 @@ To smoke-test a real backend in its own environment:
 ```
 scripts/run_hello_world.sh mace
 scripts/run_hello_world.sh uma
+scripts/run_hello_world.sh chgnet
 ```
 
 You can pass custom train/run slices to the backend smoke test without copying a
@@ -176,7 +180,7 @@ reproducing the paper-era workflow.
 
 To train the GBM model, first extract per-atom embeddings and per-atom energies
 from a trained MLIP. The following commands provide methods to extract this
-information for MACE and UMA. If using a finetuned checkpoint, the
+information for MACE, UMA, and CHGNet. If using a finetuned checkpoint, the
 `--checkpoint` flag can be used to specify the path to the checkpoint file. The
 sample should be in a format readable by ASE and contain configurations *from
 the validation set* used to train or finetune the MLIP.
@@ -197,6 +201,18 @@ python run_embeddings_uma.py \
   --head 'omat' \
   --index ":"
 ```
+
+```
+python run_embeddings_chgnet.py \
+  --sample data/example.xyz \
+  --savedir data/embeddings_chgnet \
+  --model-size 0.3.0 \
+  --index ":"
+```
+
+CHGNet is a crystal model and expects periodic inputs. Non-periodic
+configurations (e.g. isolated molecules) are automatically wrapped in a vacuum
+box before graph construction.
 
 
 ### Train GBM on per-atom embeddings and energies

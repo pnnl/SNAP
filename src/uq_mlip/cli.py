@@ -30,12 +30,16 @@ def _model_kwargs(args: argparse.Namespace) -> dict:
 
 def extract_command(args: argparse.Namespace) -> Path:
     kwargs = {
-        "model": args.model_size,
         "checkpoint": args.checkpoint,
         "device": args.device,
     }
+    # Fall back to each backend's own default model when unspecified.
+    if args.model_size is not None:
+        kwargs["model"] = args.model_size
     if args.backend == "uma":
         kwargs["head"] = args.head
+        kwargs["batch_size"] = args.batch_size
+    elif args.backend == "chgnet":
         kwargs["batch_size"] = args.batch_size
     extractor = get_extractor(args.backend, **kwargs)
     output = extractor.extract_file(args.sample, args.savedir, index=args.index)
@@ -86,10 +90,15 @@ def build_parser() -> argparse.ArgumentParser:
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     extract = subparsers.add_parser("extract", help="Extract per-atom embeddings.")
-    extract.add_argument("--backend", required=True, choices=["mace", "uma"])
+    extract.add_argument("--backend", required=True, choices=["mace", "uma", "chgnet"])
     extract.add_argument("--sample", required=True)
     extract.add_argument("--savedir", required=True)
-    extract.add_argument("--model-size", default="medium-0b")
+    extract.add_argument(
+        "--model-size",
+        default=None,
+        help="Backend model identifier. Defaults per backend: mace=medium-0b, "
+        "uma=uma-m-1p1, chgnet=0.3.0.",
+    )
     extract.add_argument("--checkpoint", default=None)
     extract.add_argument("--index", default=":")
     extract.add_argument("--device", default="cuda", choices=["cpu", "cuda"])

@@ -26,6 +26,18 @@ def test_extract_parser_accepts_default_backends():
             "embeddings",
         ]
     )
+    chgnet_args = parser.parse_args(
+        [
+            "extract",
+            "--backend",
+            "chgnet",
+            "--sample",
+            "validation.xyz",
+            "--savedir",
+            "embeddings",
+        ]
+    )
 
     assert mace_args.backend == "mace"
     assert uma_args.backend == "uma"
+    assert chgnet_args.backend == "chgnet"

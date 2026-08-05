@@ -6,9 +6,10 @@
 - Added a new `uq_mlip` package without changing the existing research scripts.
 - Added a shared embedding schema for per-atom MLIP embeddings.
 - Added a quantile GBM `UQModel` API for training, loading, and prediction.
-- Added out-of-box backend adapters for MACE and UMA.
+- Added out-of-box backend adapters for MACE, UMA, and CHGNet.
 - Moved MACE and UMA dependency stacks behind separate extras because their
-  current `e3nn` requirements conflict when installed together.
+  current `e3nn` requirements conflict when installed together. CHGNet has its
+  own extra and is independent of `e3nn`.
 - Made XGBoost import lazy so the package and CLI can import before the macOS
   OpenMP runtime is installed.
 - Added `UQCalculator` and `with_uq()` for minimal-change integration in ASE workflows.
@@ -25,10 +26,13 @@
 
 - The UQ model is dataset and MLIP specific. Users should train it on validation
   or representative configurations before using it in production simulations.
-- MACE and UMA are first-class supported default model backends, but their
-  dependencies should be installed through `uq-mlip[mace]` or `uq-mlip[uma]`.
+- MACE, UMA, and CHGNet are first-class supported default model backends, but
+  their dependencies should be installed through `uq-mlip[mace]`,
+  `uq-mlip[uma]`, or `uq-mlip[chgnet]`.
 - Existing files such as `gbm.py`, `run-gbm.py`, `run_embeddings_mace.py`,
   `run_embeddings_uma.py`, and `train-gbm.py` were intentionally left unchanged.
+  A `run_embeddings_chgnet.py` standalone script was added to mirror the
+  paper-era MACE and UMA extraction scripts.
 - The new package fixes the integration surface by adding an API wrapper rather
   than changing the existing scripts in place.
 

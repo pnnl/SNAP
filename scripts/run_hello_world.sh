@@ -6,6 +6,7 @@ usage() {
 Usage:
   scripts/run_hello_world.sh mace [venv_path] [outdir] [train_sample] [run_sample]
   scripts/run_hello_world.sh uma [venv_path] [outdir] [train_sample] [run_sample]
+  scripts/run_hello_world.sh chgnet [venv_path] [outdir] [train_sample] [run_sample]
 
 This runs extract -> train -> predict -> plot on a tiny XYZ file using the
 selected backend. It may download model weights the first time the backend is
@@ -29,7 +30,7 @@ run_stem="$(basename "$run_sample")"
 run_stem="${run_stem%.*}"
 
 case "$backend" in
-  mace|uma) ;;
+  mace|uma|chgnet) ;;
   *)
     echo "Unsupported backend: $backend" >&2
     usage
@@ -63,6 +64,19 @@ if [[ "$backend" == "mace" ]]; then
     --savedir "$outdir/embeddings" \
     --device cpu \
     --model-size small \
+    --index ":"
+elif [[ "$backend" == "chgnet" ]]; then
+  uq-mlip extract \
+    --backend chgnet \
+    --sample "$train_sample" \
+    --savedir "$outdir/embeddings" \
+    --device cpu \
+    --index ":"
+  uq-mlip extract \
+    --backend chgnet \
+    --sample "$run_sample" \
+    --savedir "$outdir/embeddings" \
+    --device cpu \
     --index ":"
 else
   uq-mlip extract \

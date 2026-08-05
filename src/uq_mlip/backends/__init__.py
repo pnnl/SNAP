@@ -1,5 +1,6 @@
 """Backend adapter registry for flagship MLIPs."""
 
+from uq_mlip.backends.chgnet import CHGNetExtractor
 from uq_mlip.backends.mace import MACEExtractor
 from uq_mlip.backends.uma import UMAExtractor
 
@@ -12,7 +13,11 @@ def get_extractor(backend: str, **kwargs):
         return MACEExtractor(**kwargs)
     if normalized == "uma":
         return UMAExtractor(**kwargs)
-    raise ValueError(f"Unsupported backend '{backend}'. Supported backends: mace, uma.")
+    if normalized == "chgnet":
+        return CHGNetExtractor(**kwargs)
+    raise ValueError(
+        f"Unsupported backend '{backend}'. Supported backends: mace, uma, chgnet."
+    )
 
 
-__all__ = ["MACEExtractor", "UMAExtractor", "get_extractor"]
+__all__ = ["CHGNetExtractor", "MACEExtractor", "UMAExtractor", "get_extractor"]

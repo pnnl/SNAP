@@ -6,15 +6,18 @@ usage() {
 Usage:
   scripts/create_backend_env.sh mace [venv_path]
   scripts/create_backend_env.sh uma [venv_path]
+  scripts/create_backend_env.sh chgnet [venv_path]
 
 Examples:
   scripts/create_backend_env.sh mace
   scripts/create_backend_env.sh uma
+  scripts/create_backend_env.sh chgnet
   PYTHON=/opt/homebrew/opt/python@3.12/bin/python3.12 scripts/create_backend_env.sh mace
 
 This creates a backend-specific virtual environment and installs uq-mlip with
 the matching backend extra. MACE and UMA currently require separate
-environments because their e3nn dependencies conflict.
+environments because their e3nn dependencies conflict; CHGNet is independent of
+e3nn and can share an environment with either.
 USAGE
 }
 
@@ -25,7 +28,7 @@ fi
 
 backend="$1"
 case "$backend" in
-  mace|uma) ;;
+  mace|uma|chgnet) ;;
   *)
     echo "Unsupported backend: $backend" >&2
     usage

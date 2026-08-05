@@ -42,6 +42,9 @@ mace = [
 uma = [
   "fairchem-core",
 ]
+chgnet = [
+  "chgnet",
+]
 dev = [
   "pytest",
 ]
