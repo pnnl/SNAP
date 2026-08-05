@@ -41,6 +41,7 @@ def extract_command(args: argparse.Namespace) -> Path:
         kwargs["batch_size"] = args.batch_size
     elif args.backend == "chgnet":
         kwargs["batch_size"] = args.batch_size
+        kwargs["on_isolated_atoms"] = args.on_isolated_atoms
     extractor = get_extractor(args.backend, **kwargs)
     output = extractor.extract_file(args.sample, args.savedir, index=args.index)
     print(output)
@@ -107,6 +108,13 @@ def build_parser() -> argparse.ArgumentParser:
         "--head",
         default="omat",
         choices=["oc20", "omat", "omol", "odac", "omc"],
+    )
+    extract.add_argument(
+        "--on-isolated-atoms",
+        default="warn",
+        choices=["ignore", "warn", "error"],
+        help="CHGNet only: how graph conversion handles atoms with no neighbor "
+        "inside the cutoff.",
     )
     extract.set_defaults(func=extract_command)
 

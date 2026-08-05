@@ -44,6 +44,8 @@ parser.add_argument('--index', default=":", type=str, help='Configurations to lo
 parser.add_argument("--device", default="cuda", type=str, choices=["cpu", "cuda"], help="Device to run inference on")
 parser.add_argument('--batch-size', default=16, type=int, help='Batch size for inference')
 parser.add_argument('--vacuum', default=15.0, type=float, help='Vacuum padding (A) applied to non-periodic inputs')
+parser.add_argument('--on-isolated-atoms', default='warn', choices=['ignore', 'warn', 'error'],
+                    help='How CHGNet graph conversion handles atoms with no neighbor inside the cutoff')
 args = parser.parse_args()
 
 os.makedirs(args.savedir, exist_ok=True)
@@ -62,7 +64,7 @@ if args.checkpoint is not None:
 else:
     model = CHGNet.load(model_name=args.model_size, use_device=args.device)
 model.eval()
-converter = CrystalGraphConverter()
+converter = CrystalGraphConverter(on_isolated_atoms=args.on_isolated_atoms)
 
 
 def to_graph(atoms):

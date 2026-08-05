@@ -29,7 +29,10 @@ class UQModel:
         self.n_estimators = n_estimators
         self.learning_rate = learning_rate
         self.max_depth = max_depth
-        self.tree_method = "gpu_hist" if device == "cuda" else "hist"
+        # XGBoost >= 2.0 removed the "gpu_hist" tree method in favor of
+        # tree_method="hist" with a separate device selector.
+        self.tree_method = "hist"
+        self.device = "cuda" if device == "cuda" else "cpu"
         self.booster = None
 
     @property
@@ -51,6 +54,7 @@ class UQModel:
             {
                 "objective": "reg:quantileerror",
                 "tree_method": self.tree_method,
+                "device": self.device,
                 "quantile_alpha": self.alpha,
                 "learning_rate": self.learning_rate,
                 "max_depth": self.max_depth,
@@ -86,6 +90,11 @@ class UQModel:
             raise FileNotFoundError(f"No trained UQ model found at {self.model_path}.")
         with self.model_path.open("rb") as handle:
             self.booster = pickle.load(handle)
+        # Honor the requested device for prediction. A booster trained on GPU
+        # otherwise stays pinned to "cuda" and warns when fed CPU-resident
+        # arrays; defaulting to "cpu" matches the numpy inputs used here, while
+        # device="cuda" opts back into GPU prediction.
+        self.booster.set_param({"device": self.device})
         return self
 
     @classmethod

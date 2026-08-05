@@ -62,7 +62,10 @@ class GBMRegressor:
         self.learning_rate = learning_rate
         self.max_depth = max_depth
 
-        self.hist = "gpu_hist" if device=='cuda' else "hist"
+        # XGBoost >= 2.0 removed the "gpu_hist" tree method in favor of
+        # tree_method="hist" with a separate device selector.
+        self.hist = "hist"
+        self.device = "cuda" if device == 'cuda' else "cpu"
         
     @property
     def model_file(self):
@@ -76,6 +79,7 @@ class GBMRegressor:
             {
                 "objective": "reg:quantileerror",
                 "tree_method": self.hist,
+                "device": self.device,
                 "quantile_alpha": self.alpha,
                 "learning_rate": self.learning_rate,
                 "max_depth": self.max_depth,

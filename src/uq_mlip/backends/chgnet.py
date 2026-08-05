@@ -25,12 +25,18 @@ class CHGNetExtractor:
         device: str = "cuda",
         batch_size: int = 16,
         vacuum: float = 15.0,
+        on_isolated_atoms: str = "warn",
     ):
         self.model = model
         self.checkpoint = checkpoint
         self.device = device
         self.batch_size = batch_size
         self.vacuum = vacuum
+        # CHGNet's graph converter defaults to raising on structures that
+        # contain atoms with no neighbor inside the graph cutoff. Over a full
+        # validation set such distorted environments are exactly what UQ should
+        # characterize, so default to "warn" rather than aborting the run.
+        self.on_isolated_atoms = on_isolated_atoms
         self._model = None
         self._converter = None
 
@@ -47,7 +53,9 @@ class CHGNetExtractor:
                 model = CHGNet.load(model_name=self.model, use_device=self.device)
             model.eval()
             self._model = model
-            self._converter = CrystalGraphConverter()
+            self._converter = CrystalGraphConverter(
+                on_isolated_atoms=self.on_isolated_atoms
+            )
         return self._model
 
     def _atoms_to_graph(self, atoms):
