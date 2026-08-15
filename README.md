@@ -274,7 +274,8 @@ If you use this model or code in your research, please cite the following papers
   url = {https://doi.org/10.1038/s41524-026-02051-8}
 }
 ```
-
+## Acknowledgements
+This work was supported by the "Transferring exascale computational chemistry to cloud computing environment and emerging hardware technologies (TEC4)" project, which is funded by the U.S. Department of Energy, Office of Science, Office of Basic Energy Sciences, the Division of Chemical Sciences, Geosciences, and Biosciences (under FWP 82037). The simulation data used in this study was supported by the U.S. Department of Energy (DOE), Office of Science, Office of Basic Energy Sciences, Division of Chemical Sciences, Geosciences & Biosciences (under FWP 47319). Pacific Northwest National Laboratory (PNNL) is a multiprogram national laboratory operated for the U.S. Department of Energy (DOE) by Battelle Memorial Institute under Contract No. DE-AC05-76RL0-1830.
 ## Visual assets
 
 The README banner image was generated with ChatGPT.
