@@ -33,6 +33,11 @@ peer-reviewed studies in
   demonstrates per-atom uncertainty as a practical diagnostic for MLIP
   robustness in challenging interfacial simulations.
 
+## Dataset
+
+The simulation data used in these studies is available at
+[this Google Drive folder](https://drive.google.com/drive/folders/1KcdqAS8SG_ybEOy0oI5X_bywJN2JSYUv?usp=sharing).
+
 ## Why per-atom UQ?
 
 MLIP predictions can look stable even when local atomic environments are
